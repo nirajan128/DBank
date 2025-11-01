@@ -1,11 +1,18 @@
+import Float "mo:base/Float";
+import Time "mo:base/Time";
 import Debug "mo:base/Debug";
+
 actor {
 
 
   //ORTHOGONAL PERSISTENCE
   //STATE VARIABLE - it holds the state of the actor, basically a database without an actual data base
   //it is declared as stable so that the value is preserved across upgrades, so when ever currentBalnce is changed it will be stored in the stable storage
-stable var currentBalance: Nat = 0;
+stable var currentBalance: Float = 0;
+
+//Time
+stable var startTime = Time.now();
+Debug.print(debug_show(startTime));
 
 //TYPES OF METHODS
 //query methods- they do not change the state of the actor - can be called getter
@@ -14,8 +21,8 @@ stable var currentBalance: Nat = 0;
 
 //UPDATE METHODS
 //deposit and withdraw are an Update methods- they can change the state of the actor -if we print something it will be shown in the replica logs
-public func deposit(amount: Nat){
-  if(amount > 0){
+public func deposit(amount: Float){
+  if(amount > 0.0){
     currentBalance+= amount;
     Debug.print("You deposited: " # debug_show(amount));
   }else{
@@ -24,7 +31,7 @@ public func deposit(amount: Nat){
   
 };
 
-public func withdraw(amount: Nat){
+public func withdraw(amount: Float){
   if(amount <= currentBalance ){
      currentBalance -= amount;
      Debug.print("You withdrawed: " # debug_show(amount));
@@ -35,11 +42,21 @@ public func withdraw(amount: Nat){
 
 
 //QUERY METHOD
-public query func getBalance() : async Nat {
+public query func getBalance() : async Float {
   return currentBalance;
 };
 
 Debug.print("Your total Amount is: " # debug_show(currentBalance));
 
+
+public func compoundInterest(){
+  let currentTime = Time.now();
+  let timeElapsedNS = currentTime - startTime;
+  let timeElapsedSeconds = timeElapsedNS / 1_000_000_000;
+  currentBalance := currentBalance * (1.01 ** Float.fromInt(timeElapsedSeconds));
+  startTime := currentTime;
+
 };
+
+}
 
