@@ -1,6 +1,11 @@
 import Debug "mo:base/Debug";
 actor {
-var currentBalance: Nat = 0;
+
+
+  //ORTHOGONAL PERSISTENCE
+  //STATE VARIABLE - it holds the state of the actor, basically a database without an actual data base
+  //it is declared as stable so that the value is preserved across upgrades, so when ever currentBalnce is changed it will be stored in the stable storage
+stable var currentBalance: Nat = 0;
 
 //TYPES OF METHODS
 //query methods- they do not change the state of the actor - can be called getter
